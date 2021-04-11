@@ -1,0 +1,76 @@
+Initialize engine version: 5.5.1f1 (88d00a7498cd)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.1]
+    Renderer: NVIDIA GeForce RTX 2060 (ID=0x1f08)
+    Vendor:   NVIDIA
+    VRAM:     5980 MB
+    Driver:   27.21.14.6172
+Begin MonoManager ReloadAssembly
+Platform assembly: C:\Users\tarek\Downloads\term3_sim_windows\term3_sim_windows\term3_sim_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading C:\Users\tarek\Downloads\term3_sim_windows\term3_sim_windows\term3_sim_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: C:\Users\tarek\Downloads\term3_sim_windows\term3_sim_windows\term3_sim_Data\Managed\Assembly-CSharp-firstpass.dll (this message is harmless)
+Loading C:\Users\tarek\Downloads\term3_sim_windows\term3_sim_windows\term3_sim_Data\Managed\Assembly-CSharp-firstpass.dll into Unity Child Domain
+Platform assembly: C:\Users\tarek\Downloads\term3_sim_windows\term3_sim_windows\term3_sim_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading C:\Users\tarek\Downloads\term3_sim_windows\term3_sim_windows\term3_sim_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: C:\Users\tarek\Downloads\term3_sim_windows\term3_sim_windows\term3_sim_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading C:\Users\tarek\Downloads\term3_sim_windows\term3_sim_windows\term3_sim_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: C:\Users\tarek\Downloads\term3_sim_windows\term3_sim_windows\term3_sim_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
+Loading C:\Users\tarek\Downloads\term3_sim_windows\term3_sim_windows\term3_sim_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
+Platform assembly: C:\Users\tarek\Downloads\term3_sim_windows\term3_sim_windows\term3_sim_Data\Managed\UnityEngine.PlaymodeTestsRunner.dll (this message is harmless)
+Loading C:\Users\tarek\Downloads\term3_sim_windows\term3_sim_windows\term3_sim_Data\Managed\UnityEngine.PlaymodeTestsRunner.dll into Unity Child Domain
+- Completed reload, in  0.031 seconds
+Platform assembly: C:\Users\tarek\Downloads\term3_sim_windows\term3_sim_windows\term3_sim_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: C:\Users\tarek\Downloads\term3_sim_windows\term3_sim_windows\term3_sim_Data\Managed\System.dll (this message is harmless)
+OnLevelWasLoaded was found on ReturnToMainMenu
+This message has been deprecated and will be removed in a later version of Unity.
+Add a delegate to SceneManager.sceneLoaded instead to get notifications after scene loading has completed
+ 
+(Filename:  Line: 382)
+
+Platform assembly: C:\Users\tarek\Downloads\term3_sim_windows\term3_sim_windows\term3_sim_Data\Managed\Mono.Security.dll (this message is harmless)
+desktop: 1920x1080 144Hz; virtual: 3968x1152 at 0,0
+<RI> Initializing input.
+<RI> Input initialized.
+desktop: 2560x1440 75Hz; virtual: 3968x1152 at 0,0
+<RI> Initialized touch support.
+UnloadTime: 0.756100 ms
+Setting up 4 worker threads for Enlighten.
+  Thread -> id: 4618 -> priority: 1 
+  Thread -> id: 29d8 -> priority: 1 
+  Thread -> id: 477c -> priority: 1 
+  Thread -> id: 2b84 -> priority: 1 
+Unloading 6 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 3.504300 ms
+
+Unloading 5 unused Assets to reduce memory usage. Loaded Objects now: 525.
+Total: 0.180800 ms (FindLiveObjects: 0.025600 ms CreateObjectMapping: 0.010100 ms MarkObjects: 0.131500 ms  DeleteObjects: 0.008400 ms)
+
+in menu script 0
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Unloading 4 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 2.345000 ms
+
+Unloading 31 unused Assets to reduce memory usage. Loaded Objects now: 9284.
+Total: 1.711500 ms (FindLiveObjects: 0.237400 ms CreateObjectMapping: 0.091500 ms MarkObjects: 0.708400 ms  DeleteObjects: 0.673600 ms)
+
+Platform assembly: C:\Users\tarek\Downloads\term3_sim_windows\term3_sim_windows\term3_sim_Data\Managed\System.Configuration.dll (this message is harmless)
+Platform assembly: C:\Users\tarek\Downloads\term3_sim_windows\term3_sim_windows\term3_sim_Data\Managed\System.Xml.dll (this message is harmless)
+4/11/2021 12:53:18 PM|Fatal|WebSocket.acceptException|System.Net.Sockets.SocketException: No connection could be made because the target machine actively refused it.
+                            
+                              at System.Net.Sockets.Socket.Connect (System.Net.EndPoint remoteEP, Boolean requireSocketPolicy) [0x00000] in <filename unknown>:0 
+                              at System.Net.Sockets.Socket.Connect (System.Net.EndPoint remoteEP) [0x00000] in <filename unknown>:0 
+                              at System.Net.Sockets.TcpClient.Connect (System.Net.IPEndPoint remote_end_point) [0x00000] in <filename unknown>:0 
+                              at System.Net.Sockets.TcpClient.Connect (System.Net.IPAddress[] ipAddresses, Int32 port) [0x00000] in <filename unknown>:0 
+Unloading 4 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 9.345400 ms
+
+Unloading 1545 unused Assets to reduce memory usage. Loaded Objects now: 533.
+Total: 4.938900 ms (FindLiveObjects: 0.057700 ms CreateObjectMapping: 0.038700 ms MarkObjects: 0.319000 ms  DeleteObjects: 4.523200 ms)
+
+in menu script 0
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
