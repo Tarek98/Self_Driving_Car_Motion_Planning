@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <limits>
 #include "Eigen-3.3/Eigen/Core"
 #include "Eigen-3.3/Eigen/QR"
 #include "helpers.h"
@@ -16,6 +17,15 @@ using std::vector;
 
 int main() {
   uWS::Hub h;
+
+  // FSM for lane change actions
+  enum LaneChangeState {
+    NONE = 0,
+    SWITCH_LEFT = 1,
+    SWITCH_RIGHT = 2
+  };
+
+  LaneChangeState lc_state = NONE;
 
   // Load up map values for waypoint's x,y,s and d normalized normal vectors
   vector<double> map_waypoints_x;
@@ -108,24 +118,84 @@ int main() {
           }
         
           bool too_close = false; // True if too close to a car in front
-        
+
+          // Store s distance of ego car to nearest neighbouring cars --> assume infinite distance before checking sensor_fusion list
+          //  (LB: Left Back, LF: Left Front, RB: Right Back, RF: Right Front)
+          double LB = std::numeric_limits<double>::infinity();
+          double LF = std::numeric_limits<double>::infinity();
+          double RB = std::numeric_limits<double>::infinity();
+          double RF = std::numeric_limits<double>::infinity();
+          // Note: if a car is right next to us, we set LF/RF to zero
+
           // Find ref_v to use
           for (int i = 0; i < sensor_fusion.size(); i++) {
-            // Check if the car is in the same lane as the ego vehicle
             float d = sensor_fusion[i][6];
-            if (d < (2+4*lane+2) && d > (2+4*lane-2)){
-              double vx = sensor_fusion[i][3];
-              double vy = sensor_fusion[i][4];
-              double check_speed = sqrt(vx*vx + vy*vy);
-              double check_car_s = sensor_fusion[i][5];
-              
-              // Calculate the check_car's future location
-              check_car_s += (double)prev_size * 0.02 * check_speed;
+            double vx = sensor_fusion[i][3];
+            double vy = sensor_fusion[i][4];
+            double check_speed = sqrt(vx*vx + vy*vy);
+            double check_car_s = sensor_fusion[i][5];
+
+            // Calculate the check_car's future location
+            check_car_s += (double)prev_size * 0.02 * check_speed;
+
+            // Determine which lane the other car is in, with reference to the ego vehicle
+            //  (The range of d values simply checks if the car is within the side boundaries of a lane)
+            bool inSameLane = d < (2+4*lane+2) && d > (2+4*lane-2);
+            bool inLeftLane = !inSameLane && lane > 0 && d < (2+4*(lane-1)+2) && d > (2+4*(lane-1)-2);
+
+            // Check if the car is in the same lane as the ego vehicle
+            if (inSameLane){
               // If the check_car is within 30 meters in front, reduce ref_vel so that we don't hit it
               if (check_car_s > car_s && (check_car_s - car_s) < 30){
                 //ref_vel = 29.5;
                 too_close = true;
+                // TEST
+                // lane = 0;
               } 
+            } 
+
+            // Check if the car is to the left lane from the ego vehicle
+            else if (inLeftLane) {
+              double check_car_s = sensor_fusion[i][5];
+              if (check_car_s >= car_s) {
+                LF = std::min(LF, check_car_s - car_s);
+              } else {
+                LB = std::min(LB, car_s - check_car_s);
+              }
+            }
+
+            else {
+              // Car is to the right lane from the ego vehicle, if we got here
+              double check_car_s = sensor_fusion[i][5];
+              if (check_car_s >= car_s) {
+                RF = std::min(RF, check_car_s - car_s);
+              } else {
+                RB = std::min(RB, car_s - check_car_s);
+              }
+            }
+          }
+
+          // Cost function: evaluate best lane change option, based on data gathered from other cars on the road
+          if (too_close == true) {
+            // check if a lane switch is safe 
+            // --> (ego car is NOT on right-most lane + gap between ego car w.r.t. cars in right lane is large enough)
+            bool isRightSafe = lane < 2 && RF >= 30 && RB >= 30;
+            // --> (ego car is NOT on left-most lane + gap between ego car w.r.t. cars in left lane is large enough)
+            bool isLeftSafe = lane > 0 && LF >= 30 && LB >= 30;
+
+            if (isLeftSafe && isRightSafe) {
+              // choose the lane switch which has the safest gap for moving
+              double rightGap = RF + RB;
+              double leftGap = LF + LB;
+              if (leftGap > rightGap) {
+                lane -= 1;
+              } else {
+                lane += 1;
+              }
+            } else if (isLeftSafe) {
+              lane -= 1;
+            } else if (isRightSafe) {
+              lane += 1;
             }
           }
         
