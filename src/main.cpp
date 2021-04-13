@@ -18,14 +18,13 @@ using std::vector;
 int main() {
   uWS::Hub h;
 
-  // FSM for lane change actions
   enum LaneChangeState {
-    NONE = 0,
-    SWITCH_LEFT = 1,
-    SWITCH_RIGHT = 2
+    MAINTAIN_LANE = 0,
+    SWITCH_RIGHT = 1,
+    SWITCH_LEFT = 2,
+    PREP_SWITCH = 3
   };
-
-  LaneChangeState lc_state = NONE;
+  LaneChangeState lc_state = MAINTAIN_LANE;
 
   // Load up map values for waypoint's x,y,s and d normalized normal vectors
   vector<double> map_waypoints_x;
@@ -67,7 +66,7 @@ int main() {
   }
 
   h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,
-               &map_waypoints_dx,&map_waypoints_dy,&ref_vel,&lane]
+               &map_waypoints_dx,&map_waypoints_dy,&ref_vel,&lane,&lc_state]
               (uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
@@ -148,9 +147,8 @@ int main() {
               // If the check_car is within 30 meters in front, reduce ref_vel so that we don't hit it
               if (check_car_s > car_s && (check_car_s - car_s) < 30){
                 //ref_vel = 29.5;
+                // std::cout << "Too close...\n";
                 too_close = true;
-                // TEST
-                // lane = 0;
               } 
             } 
 
@@ -176,26 +174,36 @@ int main() {
           }
 
           // Cost function: evaluate best lane change option, based on data gathered from other cars on the road
-          if (too_close == true) {
+          if (too_close == true || lc_state == PREP_SWITCH) {
             // check if a lane switch is safe 
             // --> (ego car is NOT on right-most lane + gap between ego car w.r.t. cars in right lane is large enough)
-            bool isRightSafe = lane < 2 && RF >= 30 && RB >= 30;
+            bool isRightSafe = lane < 2 && RF >= 25 && RB >= 25;
             // --> (ego car is NOT on left-most lane + gap between ego car w.r.t. cars in left lane is large enough)
-            bool isLeftSafe = lane > 0 && LF >= 30 && LB >= 30;
+            bool isLeftSafe = lane > 0 && LF >= 25 && LB >= 25;
+
+            double rightGap = RF + RB;
+            double leftGap = LF + LB;
 
             if (isLeftSafe && isRightSafe) {
-              // choose the lane switch which has the safest gap for moving
-              double rightGap = RF + RB;
-              double leftGap = LF + LB;
+              // perform the lane switch which has the safest gap for moving
               if (leftGap > rightGap) {
-                lane -= 1;
+                lc_state = SWITCH_LEFT;
               } else {
-                lane += 1;
+                lc_state = SWITCH_RIGHT;
               }
             } else if (isLeftSafe) {
-              lane -= 1;
+              lc_state = SWITCH_LEFT;
             } else if (isRightSafe) {
-              lane += 1;
+              lc_state = SWITCH_RIGHT;
+            } else {
+              // unsafe to lane change right now (delay it)
+              lc_state = PREP_SWITCH;
+            }
+
+            if (isLeftSafe || isRightSafe) {
+              // TO-DO: make use of global variables to keep track of speed limit and safe distance gaps
+              // collision with car in front avoided due to lane switch
+              too_close = false;
             }
           }
         
@@ -232,7 +240,15 @@ int main() {
             ptsy.push_back(ref_y_prev);
             ptsy.push_back(ref_y);
           }
-        
+
+          if (lc_state == SWITCH_LEFT) {
+            lane -= 1;
+            lc_state = MAINTAIN_LANE;
+          } else if (lc_state == SWITCH_RIGHT) {
+            lane += 1;
+            lc_state = MAINTAIN_LANE;
+          }
+
           // Add evenly 30m spaced points ahead of the starting reference
           vector<double> next_wp0 = getXY(car_s+30, 2+4*lane, map_waypoints_s, map_waypoints_x, map_waypoints_y);
           vector<double> next_wp1 = getXY(car_s+60, 2+4*lane, map_waypoints_s, map_waypoints_x, map_waypoints_y);
