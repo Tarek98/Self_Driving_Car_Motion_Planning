@@ -145,7 +145,7 @@ int main() {
             // Check if the car is in the same lane as the ego vehicle
             if (inSameLane){
               // If the check_car is within 20 meters in front, we reduce speed or lane change to avoid collision
-              if (check_car_s > car_s && (check_car_s - car_s) < 20){
+              if (check_car_s > car_s && (check_car_s - car_s) < 30){
                 // std::cout << "Too close...\n";
                 too_close = true;
               } 
@@ -176,16 +176,18 @@ int main() {
           if (too_close == true || lc_state == PREP_SWITCH) {
             // check if a lane switch is safe 
             // --> (ego car is NOT on right-most lane + gap between ego car w.r.t. cars in right lane is large enough)
-            bool isRightSafe = lane < 2 && RF >= 25 && RB >= 25;
+            bool isRightSafe = lane < 2 && RF >= 30 && RB >= 30;
             // --> (ego car is NOT on left-most lane + gap between ego car w.r.t. cars in left lane is large enough)
-            bool isLeftSafe = lane > 0 && LF >= 25 && LB >= 25;
-
-            double rightGap = RF + RB;
-            double leftGap = LF + LB;
+            bool isLeftSafe = lane > 0 && LF >= 30 && LB >= 30;
 
             if (isLeftSafe && isRightSafe) {
-              // perform the lane switch which has the safest gap for moving
-              if (leftGap > rightGap) {
+              // cost of decision to switch to a lane is determined by its front car 
+              // (because our car can drive faster in a lane with more front space)
+              // lower cost = more optimal decision --> reason for representing front space as negative
+              double rightCost = -1.0*(RF);
+              double leftCost = -1.0*(LF);
+              // perform the lane switch which has the longest gap for driving forward
+              if (leftCost < rightCost) {
                 lc_state = SWITCH_LEFT;
               } else {
                 lc_state = SWITCH_RIGHT;
