@@ -19,10 +19,10 @@ int main() {
   uWS::Hub h;
 
   enum LaneChangeState {
-    MAINTAIN_LANE = 0,
-    SWITCH_RIGHT = 1,
-    SWITCH_LEFT = 2,
-    PREP_SWITCH = 3
+    MAINTAIN_LANE = 0, // staying in current lane; it offers the best speed and safe distance to any car infront
+    SWITCH_RIGHT = 1, // switching to the right lane now
+    SWITCH_LEFT = 2, // switching to the left lane now
+    PREP_SWITCH = 3 // unsafe to switch lanes right now; preparing to switch whenever safe
   };
   LaneChangeState lc_state = MAINTAIN_LANE;
 
@@ -144,9 +144,8 @@ int main() {
 
             // Check if the car is in the same lane as the ego vehicle
             if (inSameLane){
-              // If the check_car is within 30 meters in front, reduce ref_vel so that we don't hit it
-              if (check_car_s > car_s && (check_car_s - car_s) < 30){
-                //ref_vel = 29.5;
+              // If the check_car is within 20 meters in front, we reduce speed or lane change to avoid collision
+              if (check_car_s > car_s && (check_car_s - car_s) < 20){
                 // std::cout << "Too close...\n";
                 too_close = true;
               } 
@@ -201,7 +200,6 @@ int main() {
             }
 
             if (isLeftSafe || isRightSafe) {
-              // TO-DO: make use of global variables to keep track of speed limit and safe distance gaps
               // collision with car in front avoided due to lane switch
               too_close = false;
             }
@@ -241,6 +239,7 @@ int main() {
             ptsy.push_back(ref_y);
           }
 
+          // perform lane changes by setting lane variable and maintain driving in that lane after (i.e. reset to default lc_state)
           if (lc_state == SWITCH_LEFT) {
             lane -= 1;
             lc_state = MAINTAIN_LANE;
